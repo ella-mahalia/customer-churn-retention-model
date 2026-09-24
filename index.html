@@ -1,128 +1,94 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Customer Churn Prediction | Portfolio Project</title>
-  <meta name="description" content="Machine learning churn prediction project for a subscription business." />
-  <link rel="stylesheet" href="/styles.css" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Customer Churn Prediction & Retention Modeling</title>
+  <meta name="description" content="Machine-learning churn analysis using IBM's public Telco Customer Churn sample dataset.">
+  <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-  <main class="page">
-    <section class="hero">
-      <div class="eyebrow">MACHINE LEARNING · CUSTOMER ANALYTICS</div>
-      <h1>Customer Churn Prediction <span>& Retention Modeling</span></h1>
-      <p class="lede">
-        A portfolio project that predicts subscription churn risk and translates model output into retention-focused business actions.
-      </p>
-      <div class="hero-meta">
-        <span>Classification</span><span>Python</span><span>scikit-learn</span><span>Business Analytics</span>
+<main class="page">
+  <section class="hero">
+    <div class="eyebrow">MACHINE LEARNING · CUSTOMER ANALYTICS</div>
+    <h1>Customer Churn Prediction <span>& Retention Modeling</span></h1>
+    <p class="lede">
+      A classification project using IBM's public Telco Customer Churn sample data to estimate customer churn risk and support retention prioritization.
+    </p>
+    <div class="hero-meta">
+      <span>Real Public Dataset</span><span>7,043 Customers</span><span>Python</span><span>scikit-learn</span>
+    </div>
+  </section>
+
+  <section class="stats">
+    <article><strong>7,043</strong><span>customer records</span></article>
+    <article><strong>21</strong><span>raw columns</span></article>
+    <article><strong>3</strong><span>models compared</span></article>
+    <article><strong>5-fold</strong><span>cross-validation</span></article>
+  </section>
+
+  <section class="content-grid">
+    <article class="card">
+      <div class="eyebrow">01 · PROBLEM</div>
+      <h2>Who is most likely to churn?</h2>
+      <p>The project estimates churn risk from account, contract, service, billing, and demographic attributes.</p>
+    </article>
+    <article class="card">
+      <div class="eyebrow">02 · MODELING</div>
+      <h2>Compare, don't assume.</h2>
+      <p>Logistic Regression, Random Forest, and Gradient Boosting are evaluated with ROC-AUC, precision, recall, F1, and cross-validation.</p>
+    </article>
+    <article class="card">
+      <div class="eyebrow">03 · BUSINESS USE</div>
+      <h2>Turn probability into action.</h2>
+      <p>Predicted probabilities are converted to Low, Medium, and High retention-risk groups for prioritization.</p>
+    </article>
+  </section>
+
+  <section class="predictor">
+    <div class="section-heading">
+      <div class="eyebrow">INTERACTIVE MODEL</div>
+      <h2>Estimate a customer’s churn risk</h2>
+      <p>The form uses the same feature structure as the IBM sample dataset.</p>
+    </div>
+
+    <form id="form" class="form-grid">
+      <label>Gender<select id="gender"><option>Female</option><option>Male</option></select></label>
+      <label>Senior citizen<select id="SeniorCitizen"><option value="0">No</option><option value="1">Yes</option></select></label>
+      <label>Partner<select id="Partner"><option>Yes</option><option>No</option></select></label>
+      <label>Dependents<select id="Dependents"><option>No</option><option>Yes</option></select></label>
+      <label>Tenure (months)<input id="tenure" type="number" min="0" max="72" value="18"></label>
+      <label>Phone service<select id="PhoneService"><option>Yes</option><option>No</option></select></label>
+      <label>Multiple lines<select id="MultipleLines"><option>No</option><option>Yes</option><option>No phone service</option></select></label>
+      <label>Internet service<select id="InternetService"><option>Fiber optic</option><option>DSL</option><option>No</option></select></label>
+      <label>Online security<select id="OnlineSecurity"><option>No</option><option>Yes</option><option>No internet service</option></select></label>
+      <label>Online backup<select id="OnlineBackup"><option>No</option><option>Yes</option><option>No internet service</option></select></label>
+      <label>Device protection<select id="DeviceProtection"><option>No</option><option>Yes</option><option>No internet service</option></select></label>
+      <label>Tech support<select id="TechSupport"><option>No</option><option>Yes</option><option>No internet service</option></select></label>
+      <label>Streaming TV<select id="StreamingTV"><option>No</option><option>Yes</option><option>No internet service</option></select></label>
+      <label>Streaming movies<select id="StreamingMovies"><option>No</option><option>Yes</option><option>No internet service</option></select></label>
+      <label>Contract<select id="Contract"><option>Month-to-month</option><option>One year</option><option>Two year</option></select></label>
+      <label>Paperless billing<select id="PaperlessBilling"><option>Yes</option><option>No</option></select></label>
+      <label>Payment method<select id="PaymentMethod"><option>Electronic check</option><option>Mailed check</option><option>Bank transfer (automatic)</option><option>Credit card (automatic)</option></select></label>
+      <label>Monthly charges ($)<input id="MonthlyCharges" type="number" min="0" step=".01" value="79.85"></label>
+      <label>Total charges ($)<input id="TotalCharges" type="number" min="0" step=".01" value="1400"></label>
+      <button type="submit">Predict churn risk →</button>
+    </form>
+
+    <div id="result" class="result hidden">
+      <div class="result-top">
+        <div><span>Predicted churn probability</span><strong id="probability">—</strong></div>
+        <div id="risk" class="pill">—</div>
       </div>
-    </section>
+      <div class="meter"><div id="fill"></div></div>
+      <p id="action"></p>
+    </div>
+  </section>
 
-    <section class="grid">
-      <article class="card">
-        <h2>Business Question</h2>
-        <p>Which customers are most likely to cancel their subscription, and which behaviors are associated with higher churn risk?</p>
-      </article>
-      <article class="card">
-        <h2>Modeling Approach</h2>
-        <p>Logistic Regression, Random Forest, and Gradient Boosting are compared using ROC-AUC, precision, recall, F1, and accuracy.</p>
-      </article>
-      <article class="card">
-        <h2>Retention Use Case</h2>
-        <p>Customers are segmented into Low, Medium, and High risk so a retention team can prioritize outreach.</p>
-      </article>
-    </section>
-
-    <section class="predictor">
-      <div class="section-copy">
-        <div class="eyebrow">INTERACTIVE MODEL</div>
-        <h2>Estimate churn risk</h2>
-        <p>Adjust the customer profile and run the deployed machine-learning model.</p>
-      </div>
-
-      <form id="churn-form" class="form-grid">
-        <label>Tenure (months)
-          <input id="tenure_months" type="number" min="1" max="72" value="18" required>
-        </label>
-
-        <label>Monthly charge ($)
-          <input id="monthly_charge" type="number" min="10" max="120" step="1" value="55" required>
-        </label>
-
-        <label>Contract type
-          <select id="contract_type">
-            <option>Monthly</option>
-            <option>Annual</option>
-            <option>Two-Year</option>
-          </select>
-        </label>
-
-        <label>Payment method
-          <select id="payment_method">
-            <option>Credit Card</option>
-            <option>Debit Card</option>
-            <option>PayPal</option>
-            <option>Bank Transfer</option>
-          </select>
-        </label>
-
-        <label>Autopay
-          <select id="autopay"><option>Yes</option><option>No</option></select>
-        </label>
-
-        <label>Support tickets (90d)
-          <input id="support_tickets_90d" type="number" min="0" max="8" value="1" required>
-        </label>
-
-        <label>Weekly usage hours
-          <input id="weekly_usage_hours" type="number" min="0.2" max="35" step="0.5" value="8" required>
-        </label>
-
-        <label>Number of products
-          <input id="num_products" type="number" min="1" max="4" value="2" required>
-        </label>
-
-        <label>Late payments (12m)
-          <input id="late_payments_12m" type="number" min="0" max="6" value="0" required>
-        </label>
-
-        <label>Discount active
-          <select id="discount_active"><option>Yes</option><option>No</option></select>
-        </label>
-
-        <label>Satisfaction score
-          <input id="satisfaction_score" type="number" min="1" max="5" value="4" required>
-        </label>
-
-        <label>Region
-          <select id="region">
-            <option>Northeast</option><option>South</option><option>Midwest</option><option>West</option>
-          </select>
-        </label>
-
-        <button class="button" type="submit">Predict churn risk →</button>
-      </form>
-
-      <div id="result" class="result hidden" aria-live="polite">
-        <div class="result-top">
-          <div>
-            <span class="small">Predicted churn probability</span>
-            <strong id="probability">—</strong>
-          </div>
-          <span id="risk-badge" class="risk">—</span>
-        </div>
-        <div class="meter"><div id="meter-fill"></div></div>
-        <p id="action"></p>
-      </div>
-    </section>
-
-    <section class="note">
-      <strong>Portfolio note:</strong>
-      This project uses synthetic subscription-business data and is intended for educational and portfolio demonstration purposes.
-    </section>
-  </main>
-  <script src="/app.js"></script>
+  <section class="source-note">
+    <strong>Dataset source:</strong> IBM Telco Customer Churn sample data. The repository includes a download script so the raw public dataset is retrieved directly from the IBM GitHub archive before training.
+  </section>
+</main>
+<script src="/app.js"></script>
 </body>
 </html>

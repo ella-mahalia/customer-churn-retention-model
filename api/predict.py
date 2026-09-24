@@ -5,8 +5,27 @@ from pathlib import Path
 import joblib
 import pandas as pd
 
-MODEL_PATH = Path(__file__).resolve().parents[1] / "model" / "best_churn_model.joblib"
-model = joblib.load(MODEL_PATH)
+ROOT = Path(__file__).resolve().parents[1]
+MODEL_PATH = ROOT / "model" / "best_churn_model.joblib"
+
+MODEL = None
+MODEL_ERROR = None
+
+try:
+    if MODEL_PATH.exists():
+        MODEL = joblib.load(MODEL_PATH)
+    else:
+        MODEL_ERROR = "Model file is missing. Download the real IBM dataset and run src/train_model.py before deploying."
+except Exception as exc:
+    MODEL_ERROR = str(exc)
+
+FEATURES = [
+    "gender", "SeniorCitizen", "Partner", "Dependents", "tenure",
+    "PhoneService", "MultipleLines", "InternetService", "OnlineSecurity",
+    "OnlineBackup", "DeviceProtection", "TechSupport", "StreamingTV",
+    "StreamingMovies", "Contract", "PaperlessBilling", "PaymentMethod",
+    "MonthlyCharges", "TotalCharges"
+]
 
 class handler(BaseHTTPRequestHandler):
     def _send(self, status, payload):
@@ -14,9 +33,6 @@ class handler(BaseHTTPRequestHandler):
         self.send_response(status)
         self.send_header("Content-Type", "application/json")
         self.send_header("Content-Length", str(len(body)))
-        self.send_header("Access-Control-Allow-Origin", "*")
-        self.send_header("Access-Control-Allow-Headers", "Content-Type")
-        self.send_header("Access-Control-Allow-Methods", "POST, OPTIONS")
         self.end_headers()
         self.wfile.write(body)
 
@@ -24,62 +40,55 @@ class handler(BaseHTTPRequestHandler):
         self._send(200, {"ok": True})
 
     def do_POST(self):
+        if MODEL is None:
+            return self._send(503, {"error": MODEL_ERROR or "Model unavailable"})
+
         try:
             length = int(self.headers.get("Content-Length", "0"))
-            raw = self.rfile.read(length)
-            data = json.loads(raw.decode("utf-8"))
+            payload = json.loads(self.rfile.read(length).decode("utf-8"))
 
-            required = [
-                "tenure_months",
-                "monthly_charge",
-                "contract_type",
-                "payment_method",
-                "autopay",
-                "support_tickets_90d",
-                "weekly_usage_hours",
-                "num_products",
-                "late_payments_12m",
-                "discount_active",
-                "satisfaction_score",
-                "region",
-            ]
-
-            missing = [field for field in required if field not in data]
+            missing = [f for f in FEATURES if f not in payload]
             if missing:
                 return self._send(400, {"error": f"Missing fields: {', '.join(missing)}"})
 
             row = pd.DataFrame([{
-                "tenure_months": int(data["tenure_months"]),
-                "monthly_charge": float(data["monthly_charge"]),
-                "contract_type": str(data["contract_type"]),
-                "payment_method": str(data["payment_method"]),
-                "autopay": str(data["autopay"]),
-                "support_tickets_90d": int(data["support_tickets_90d"]),
-                "weekly_usage_hours": float(data["weekly_usage_hours"]),
-                "num_products": int(data["num_products"]),
-                "late_payments_12m": int(data["late_payments_12m"]),
-                "discount_active": str(data["discount_active"]),
-                "satisfaction_score": int(data["satisfaction_score"]),
-                "region": str(data["region"]),
+                "gender": str(payload["gender"]),
+                "SeniorCitizen": int(payload["SeniorCitizen"]),
+                "Partner": str(payload["Partner"]),
+                "Dependents": str(payload["Dependents"]),
+                "tenure": int(payload["tenure"]),
+                "PhoneService": str(payload["PhoneService"]),
+                "MultipleLines": str(payload["MultipleLines"]),
+                "InternetService": str(payload["InternetService"]),
+                "OnlineSecurity": str(payload["OnlineSecurity"]),
+                "OnlineBackup": str(payload["OnlineBackup"]),
+                "DeviceProtection": str(payload["DeviceProtection"]),
+                "TechSupport": str(payload["TechSupport"]),
+                "StreamingTV": str(payload["StreamingTV"]),
+                "StreamingMovies": str(payload["StreamingMovies"]),
+                "Contract": str(payload["Contract"]),
+                "PaperlessBilling": str(payload["PaperlessBilling"]),
+                "PaymentMethod": str(payload["PaymentMethod"]),
+                "MonthlyCharges": float(payload["MonthlyCharges"]),
+                "TotalCharges": float(payload["TotalCharges"])
             }])
 
-            probability = float(model.predict_proba(row)[0, 1])
+            probability = float(MODEL.predict_proba(row)[0, 1])
 
             if probability >= 0.65:
                 risk = "High"
-                action = "Prioritize this customer for retention outreach and review recent support or billing friction."
+                action = "Prioritize retention outreach and review contract, service, and billing friction."
             elif probability >= 0.35:
                 risk = "Medium"
-                action = "Monitor engagement and consider proactive communication before the next billing cycle."
+                action = "Monitor engagement and consider proactive retention messaging."
             else:
                 risk = "Low"
-                action = "No immediate intervention is needed; continue standard engagement."
+                action = "No immediate retention intervention is indicated by the model."
 
             self._send(200, {
                 "churn_probability": probability,
                 "risk_segment": risk,
                 "recommended_action": action
             })
-
         except Exception as exc:
             self._send(500, {"error": str(exc)})
