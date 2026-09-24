@@ -1,94 +1,871 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Customer Churn Prediction & Retention Modeling</title>
-  <meta name="description" content="Machine-learning churn analysis using IBM's public Telco Customer Churn sample dataset.">
-  <link rel="stylesheet" href="/styles.css">
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
+
+  <title>
+    Customer Churn Prediction & Retention Modeling
+  </title>
+
+  <meta
+    name="description"
+    content="Machine learning customer churn analysis using IBM Telco Customer Churn data."
+  />
+
+  <link rel="stylesheet" href="/styles.css" />
 </head>
+
 <body>
-<main class="page">
-  <section class="hero">
-    <div class="eyebrow">MACHINE LEARNING · CUSTOMER ANALYTICS</div>
-    <h1>Customer Churn Prediction <span>& Retention Modeling</span></h1>
-    <p class="lede">
-      A classification project using IBM's public Telco Customer Churn sample data to estimate customer churn risk and support retention prioritization.
-    </p>
-    <div class="hero-meta">
-      <span>Real Public Dataset</span><span>7,043 Customers</span><span>Python</span><span>scikit-learn</span>
-    </div>
-  </section>
 
-  <section class="stats">
-    <article><strong>7,043</strong><span>customer records</span></article>
-    <article><strong>21</strong><span>raw columns</span></article>
-    <article><strong>3</strong><span>models compared</span></article>
-    <article><strong>5-fold</strong><span>cross-validation</span></article>
-  </section>
+  <!-- =====================================================
+       TOP NAV
+  ====================================================== -->
 
-  <section class="content-grid">
-    <article class="card">
-      <div class="eyebrow">01 · PROBLEM</div>
-      <h2>Who is most likely to churn?</h2>
-      <p>The project estimates churn risk from account, contract, service, billing, and demographic attributes.</p>
-    </article>
-    <article class="card">
-      <div class="eyebrow">02 · MODELING</div>
-      <h2>Compare, don't assume.</h2>
-      <p>Logistic Regression, Random Forest, and Gradient Boosting are evaluated with ROC-AUC, precision, recall, F1, and cross-validation.</p>
-    </article>
-    <article class="card">
-      <div class="eyebrow">03 · BUSINESS USE</div>
-      <h2>Turn probability into action.</h2>
-      <p>Predicted probabilities are converted to Low, Medium, and High retention-risk groups for prioritization.</p>
-    </article>
-  </section>
+  <header class="topbar">
 
-  <section class="predictor">
-    <div class="section-heading">
-      <div class="eyebrow">INTERACTIVE MODEL</div>
-      <h2>Estimate a customer’s churn risk</h2>
-      <p>The form uses the same feature structure as the IBM sample dataset.</p>
+    <a href="/" class="brand">
+      CHURN<span>LAB</span>
+    </a>
+
+    <nav>
+      <a href="#overview">Overview</a>
+      <a href="#methodology">Methodology</a>
+      <a href="#predictor">Model</a>
+    </nav>
+
+    <div class="dataset-label">
+      IBM TELCO DATA
     </div>
 
-    <form id="form" class="form-grid">
-      <label>Gender<select id="gender"><option>Female</option><option>Male</option></select></label>
-      <label>Senior citizen<select id="SeniorCitizen"><option value="0">No</option><option value="1">Yes</option></select></label>
-      <label>Partner<select id="Partner"><option>Yes</option><option>No</option></select></label>
-      <label>Dependents<select id="Dependents"><option>No</option><option>Yes</option></select></label>
-      <label>Tenure (months)<input id="tenure" type="number" min="0" max="72" value="18"></label>
-      <label>Phone service<select id="PhoneService"><option>Yes</option><option>No</option></select></label>
-      <label>Multiple lines<select id="MultipleLines"><option>No</option><option>Yes</option><option>No phone service</option></select></label>
-      <label>Internet service<select id="InternetService"><option>Fiber optic</option><option>DSL</option><option>No</option></select></label>
-      <label>Online security<select id="OnlineSecurity"><option>No</option><option>Yes</option><option>No internet service</option></select></label>
-      <label>Online backup<select id="OnlineBackup"><option>No</option><option>Yes</option><option>No internet service</option></select></label>
-      <label>Device protection<select id="DeviceProtection"><option>No</option><option>Yes</option><option>No internet service</option></select></label>
-      <label>Tech support<select id="TechSupport"><option>No</option><option>Yes</option><option>No internet service</option></select></label>
-      <label>Streaming TV<select id="StreamingTV"><option>No</option><option>Yes</option><option>No internet service</option></select></label>
-      <label>Streaming movies<select id="StreamingMovies"><option>No</option><option>Yes</option><option>No internet service</option></select></label>
-      <label>Contract<select id="Contract"><option>Month-to-month</option><option>One year</option><option>Two year</option></select></label>
-      <label>Paperless billing<select id="PaperlessBilling"><option>Yes</option><option>No</option></select></label>
-      <label>Payment method<select id="PaymentMethod"><option>Electronic check</option><option>Mailed check</option><option>Bank transfer (automatic)</option><option>Credit card (automatic)</option></select></label>
-      <label>Monthly charges ($)<input id="MonthlyCharges" type="number" min="0" step=".01" value="79.85"></label>
-      <label>Total charges ($)<input id="TotalCharges" type="number" min="0" step=".01" value="1400"></label>
-      <button type="submit">Predict churn risk →</button>
-    </form>
+  </header>
 
-    <div id="result" class="result hidden">
-      <div class="result-top">
-        <div><span>Predicted churn probability</span><strong id="probability">—</strong></div>
-        <div id="risk" class="pill">—</div>
+
+  <main>
+
+    <!-- =====================================================
+         HERO
+    ====================================================== -->
+
+    <section class="hero" id="overview">
+
+      <div class="hero-copy">
+
+        <div class="section-label">
+          CUSTOMER ANALYTICS / MACHINE LEARNING
+        </div>
+
+        <h1>
+          Predicting customer
+          <span>churn before it happens.</span>
+        </h1>
+
+        <p class="hero-description">
+          A machine learning analysis using IBM's public
+          Telco Customer Churn dataset to identify customers
+          with elevated churn risk and support more focused
+          retention strategies.
+        </p>
+
+        <div class="hero-actions">
+
+          <a href="#predictor" class="primary-button">
+            Test the model
+            <span>→</span>
+          </a>
+
+          <a href="#methodology" class="text-link">
+            View methodology
+          </a>
+
+        </div>
+
       </div>
-      <div class="meter"><div id="fill"></div></div>
-      <p id="action"></p>
-    </div>
-  </section>
 
-  <section class="source-note">
-    <strong>Dataset source:</strong> IBM Telco Customer Churn sample data. The repository includes a download script so the raw public dataset is retrieved directly from the IBM GitHub archive before training.
-  </section>
-</main>
-<script src="/app.js"></script>
+
+      <!-- MODEL SUMMARY -->
+
+      <aside class="model-summary">
+
+        <div class="summary-header">
+
+          <div>
+            <span class="summary-kicker">
+              SELECTED MODEL
+            </span>
+
+            <h2>
+              Logistic Regression
+            </h2>
+          </div>
+
+          <div class="status-badge">
+            Deployed
+          </div>
+
+        </div>
+
+
+        <div class="score-display">
+
+          <span class="score-label">
+            Test ROC-AUC
+          </span>
+
+          <strong>
+            0.846
+          </strong>
+
+          <div class="score-track">
+            <div class="score-fill"></div>
+          </div>
+
+        </div>
+
+
+        <div class="model-meta">
+
+          <div>
+            <span>Recall</span>
+            <strong>79.4%</strong>
+          </div>
+
+          <div>
+            <span>F1 Score</span>
+            <strong>62.7%</strong>
+          </div>
+
+          <div>
+            <span>CV ROC-AUC</span>
+            <strong>0.844</strong>
+          </div>
+
+        </div>
+
+      </aside>
+
+    </section>
+
+
+    <!-- =====================================================
+         DATASET METRICS
+    ====================================================== -->
+
+    <section class="metric-strip">
+
+      <div class="metric">
+
+        <span class="metric-number">
+          7,043
+        </span>
+
+        <span class="metric-label">
+          Customer records
+        </span>
+
+      </div>
+
+
+      <div class="metric">
+
+        <span class="metric-number">
+          26.5%
+        </span>
+
+        <span class="metric-label">
+          Observed churn rate
+        </span>
+
+      </div>
+
+
+      <div class="metric">
+
+        <span class="metric-number">
+          21
+        </span>
+
+        <span class="metric-label">
+          Raw variables
+        </span>
+
+      </div>
+
+
+      <div class="metric">
+
+        <span class="metric-number">
+          3
+        </span>
+
+        <span class="metric-label">
+          Models compared
+        </span>
+
+      </div>
+
+
+      <div class="metric">
+
+        <span class="metric-number">
+          5-fold
+        </span>
+
+        <span class="metric-label">
+          Cross-validation
+        </span>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         BUSINESS QUESTION
+    ====================================================== -->
+
+    <section class="business-section">
+
+      <div class="section-label">
+        BUSINESS PROBLEM
+      </div>
+
+      <div class="business-grid">
+
+        <h2>
+          Which customers are most likely to leave?
+        </h2>
+
+        <div class="business-copy">
+
+          <p>
+            Customer churn directly affects recurring revenue,
+            but retention teams cannot contact every customer
+            with the same level of attention.
+          </p>
+
+          <p>
+            This project uses account, contract, service,
+            billing, and demographic information to estimate
+            churn probability and create customer risk groups
+            that can support retention prioritization.
+          </p>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         METHODOLOGY
+    ====================================================== -->
+
+    <section
+      class="methodology-section"
+      id="methodology"
+    >
+
+      <div class="section-heading">
+
+        <div>
+
+          <div class="section-label">
+            MODEL DEVELOPMENT
+          </div>
+
+          <h2>
+            From raw customer data to retention risk.
+          </h2>
+
+        </div>
+
+        <p>
+          The workflow focuses on reproducible preprocessing,
+          model comparison, validation, and business
+          interpretation.
+        </p>
+
+      </div>
+
+
+      <div class="process-grid">
+
+        <article class="process-item">
+
+          <span class="process-number">
+            01
+          </span>
+
+          <h3>
+            Clean
+          </h3>
+
+          <p>
+            Converted TotalCharges to numeric values, handled
+            missing records, and separated modeling features
+            from customer identifiers.
+          </p>
+
+        </article>
+
+
+        <article class="process-item">
+
+          <span class="process-number">
+            02
+          </span>
+
+          <h3>
+            Transform
+          </h3>
+
+          <p>
+            Standardized numeric variables and one-hot encoded
+            categorical customer and service attributes.
+          </p>
+
+        </article>
+
+
+        <article class="process-item">
+
+          <span class="process-number">
+            03
+          </span>
+
+          <h3>
+            Compare
+          </h3>
+
+          <p>
+            Evaluated Logistic Regression, Random Forest, and
+            Gradient Boosting with multiple classification
+            metrics.
+          </p>
+
+        </article>
+
+
+        <article class="process-item">
+
+          <span class="process-number">
+            04
+          </span>
+
+          <h3>
+            Validate
+          </h3>
+
+          <p>
+            Used a stratified train/test split and five-fold
+            cross-validation to assess model stability.
+          </p>
+
+        </article>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         IMPORTANT FEATURES
+    ====================================================== -->
+
+    <section class="drivers-section">
+
+      <div>
+
+        <div class="section-label">
+          MODEL INSIGHTS
+        </div>
+
+        <h2>
+          Important churn signals
+        </h2>
+
+        <p>
+          Permutation importance on the selected model showed
+          that customer tenure was the strongest predictive
+          variable in the test set.
+        </p>
+
+      </div>
+
+
+      <div class="drivers-list">
+
+        <div class="driver">
+
+          <span>01</span>
+
+          <div>
+            <strong>Tenure</strong>
+            <small>Highest permutation importance</small>
+          </div>
+
+          <div class="driver-bar">
+            <i style="width: 100%"></i>
+          </div>
+
+        </div>
+
+
+        <div class="driver">
+
+          <span>02</span>
+
+          <div>
+            <strong>Internet Service</strong>
+            <small>Customer service configuration</small>
+          </div>
+
+          <div class="driver-bar">
+            <i style="width: 54%"></i>
+          </div>
+
+        </div>
+
+
+        <div class="driver">
+
+          <span>03</span>
+
+          <div>
+            <strong>Contract</strong>
+            <small>Commitment structure</small>
+          </div>
+
+          <div class="driver-bar">
+            <i style="width: 51%"></i>
+          </div>
+
+        </div>
+
+
+        <div class="driver">
+
+          <span>04</span>
+
+          <div>
+            <strong>Monthly Charges</strong>
+            <small>Recurring customer cost</small>
+          </div>
+
+          <div class="driver-bar">
+            <i style="width: 43%"></i>
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         INTERACTIVE PREDICTOR
+    ====================================================== -->
+
+    <section
+      class="predictor-section"
+      id="predictor"
+    >
+
+      <div class="predictor-heading">
+
+        <div class="section-label">
+          LIVE MODEL
+        </div>
+
+        <h2>
+          Estimate customer churn risk
+        </h2>
+
+        <p>
+          Enter a customer profile using the same feature
+          structure used by the IBM dataset.
+        </p>
+
+      </div>
+
+
+      <div class="predictor-layout">
+
+        <!-- FORM -->
+
+        <form id="form" class="prediction-form">
+
+          <div class="form-section">
+
+            <h3>
+              Customer profile
+            </h3>
+
+            <div class="form-grid">
+
+              <label>
+                Gender
+
+                <select id="gender">
+                  <option>Female</option>
+                  <option>Male</option>
+                </select>
+              </label>
+
+
+              <label>
+                Senior citizen
+
+                <select id="SeniorCitizen">
+                  <option value="0">No</option>
+                  <option value="1">Yes</option>
+                </select>
+              </label>
+
+
+              <label>
+                Partner
+
+                <select id="Partner">
+                  <option>Yes</option>
+                  <option>No</option>
+                </select>
+              </label>
+
+
+              <label>
+                Dependents
+
+                <select id="Dependents">
+                  <option>No</option>
+                  <option>Yes</option>
+                </select>
+              </label>
+
+
+              <label>
+                Tenure
+
+                <div class="input-with-unit">
+                  <input
+                    id="tenure"
+                    type="number"
+                    min="0"
+                    max="72"
+                    value="18"
+                  />
+                  <span>months</span>
+                </div>
+
+              </label>
+
+            </div>
+
+          </div>
+
+
+          <div class="form-section">
+
+            <h3>
+              Services
+            </h3>
+
+            <div class="form-grid">
+
+              <label>
+                Phone service
+
+                <select id="PhoneService">
+                  <option>Yes</option>
+                  <option>No</option>
+                </select>
+              </label>
+
+
+              <label>
+                Multiple lines
+
+                <select id="MultipleLines">
+                  <option>No</option>
+                  <option>Yes</option>
+                  <option>No phone service</option>
+                </select>
+              </label>
+
+
+              <label>
+                Internet service
+
+                <select id="InternetService">
+                  <option>Fiber optic</option>
+                  <option>DSL</option>
+                  <option>No</option>
+                </select>
+              </label>
+
+
+              <label>
+                Online security
+
+                <select id="OnlineSecurity">
+                  <option>No</option>
+                  <option>Yes</option>
+                  <option>No internet service</option>
+                </select>
+              </label>
+
+
+              <label>
+                Online backup
+
+                <select id="OnlineBackup">
+                  <option>No</option>
+                  <option>Yes</option>
+                  <option>No internet service</option>
+                </select>
+              </label>
+
+
+              <label>
+                Device protection
+
+                <select id="DeviceProtection">
+                  <option>No</option>
+                  <option>Yes</option>
+                  <option>No internet service</option>
+                </select>
+              </label>
+
+
+              <label>
+                Tech support
+
+                <select id="TechSupport">
+                  <option>No</option>
+                  <option>Yes</option>
+                  <option>No internet service</option>
+                </select>
+              </label>
+
+
+              <label>
+                Streaming TV
+
+                <select id="StreamingTV">
+                  <option>No</option>
+                  <option>Yes</option>
+                  <option>No internet service</option>
+                </select>
+              </label>
+
+
+              <label>
+                Streaming movies
+
+                <select id="StreamingMovies">
+                  <option>No</option>
+                  <option>Yes</option>
+                  <option>No internet service</option>
+                </select>
+              </label>
+
+            </div>
+
+          </div>
+
+
+          <div class="form-section">
+
+            <h3>
+              Account & billing
+            </h3>
+
+            <div class="form-grid">
+
+              <label>
+                Contract
+
+                <select id="Contract">
+                  <option>Month-to-month</option>
+                  <option>One year</option>
+                  <option>Two year</option>
+                </select>
+              </label>
+
+
+              <label>
+                Paperless billing
+
+                <select id="PaperlessBilling">
+                  <option>Yes</option>
+                  <option>No</option>
+                </select>
+              </label>
+
+
+              <label>
+                Payment method
+
+                <select id="PaymentMethod">
+                  <option>Electronic check</option>
+                  <option>Mailed check</option>
+                  <option>Bank transfer (automatic)</option>
+                  <option>Credit card (automatic)</option>
+                </select>
+              </label>
+
+
+              <label>
+                Monthly charges
+
+                <div class="input-with-unit money">
+                  <span>$</span>
+
+                  <input
+                    id="MonthlyCharges"
+                    type="number"
+                    min="0"
+                    step=".01"
+                    value="79.85"
+                  />
+                </div>
+
+              </label>
+
+
+              <label>
+                Total charges
+
+                <div class="input-with-unit money">
+                  <span>$</span>
+
+                  <input
+                    id="TotalCharges"
+                    type="number"
+                    min="0"
+                    step=".01"
+                    value="1400"
+                  />
+                </div>
+
+              </label>
+
+            </div>
+
+          </div>
+
+
+          <button
+            type="submit"
+            class="predict-button"
+          >
+            Run prediction
+            <span>→</span>
+          </button>
+
+        </form>
+
+
+        <!-- RESULT -->
+
+        <aside class="prediction-panel">
+
+          <div class="prediction-panel-header">
+
+            <span>
+              MODEL OUTPUT
+            </span>
+
+            <i></i>
+
+          </div>
+
+
+          <div
+            id="result"
+            class="result empty-result"
+          >
+
+            <div class="empty-state">
+
+              <div class="empty-icon">
+                ↗
+              </div>
+
+              <h3>
+                Ready to predict
+              </h3>
+
+              <p>
+                Complete the customer profile and run the
+                model to generate a churn probability.
+              </p>
+
+            </div>
+
+          </div>
+
+        </aside>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         SOURCE
+    ====================================================== -->
+
+    <footer>
+
+      <div>
+
+        <strong>
+          Dataset
+        </strong>
+
+        <p>
+          IBM Telco Customer Churn public sample dataset
+        </p>
+
+      </div>
+
+      <div>
+
+        <strong>
+          Purpose
+        </strong>
+
+        <p>
+          Educational and portfolio demonstration
+        </p>
+
+      </div>
+
+      <div>
+
+        <strong>
+          Stack
+        </strong>
+
+        <p>
+          Python · scikit-learn · Vercel
+        </p>
+
+      </div>
+
+    </footer>
+
+  </main>
+
+
+  <script src="/app.js"></script>
+
 </body>
 </html>
