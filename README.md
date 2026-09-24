@@ -1,59 +1,68 @@
 # Customer Churn Prediction & Retention Modeling
 
-A portfolio-ready machine-learning project built on IBM's public **Telco Customer Churn** sample dataset.
+## Project Overview
 
-## Why this version is stronger
+Customer churn is an important business problem because losing existing customers can directly affect recurring revenue and long-term growth. Instead of treating every customer the same, companies can use customer behavior and account information to identify which customers may be more likely to leave.
 
-This version replaces the earlier synthetic dataset with the real public IBM sample. It includes:
+For this project, I used the public **IBM Telco Customer Churn dataset**, containing **7,043 customer records**, to build a machine learning model that estimates a customer's probability of churning.
 
-- 7,043 customer records
-- 21 raw columns
-- real data cleaning (`TotalCharges` contains blank values)
-- exploratory churn analysis
+The final project also includes an interactive web application where a user can enter a customer profile and receive a predicted churn probability, risk level, and suggested retention action.
+
+## Why This Matters
+
+A churn model can help a business move from reactive customer retention to a more proactive approach.
+
+Rather than waiting until a customer cancels service, a company could use predicted churn risk to help:
+
+- Prioritize customers for retention outreach
+- Identify patterns associated with customer attrition
+- Focus retention resources on higher-risk customers
+- Better understand how contracts, pricing, tenure, and services relate to churn
+
+The goal is not just to predict whether someone will leave, but to turn that prediction into information that can support business decisions.
+
+## What I Found
+
+The dataset had an overall churn rate of approximately **26.5%**.
+
+I compared three classification models:
+
 - Logistic Regression
 - Random Forest
 - Gradient Boosting
-- stratified 5-fold cross-validation
-- ROC-AUC, precision, recall, F1, accuracy
-- model-agnostic permutation importance
-- Low / Medium / High risk segmentation
-- Vercel-ready interactive prediction page
 
-## First-time setup
+The selected **Logistic Regression model** achieved a test **ROC-AUC of 0.846** and a recall of approximately **79.4%**.
 
-From the project folder:
+Recall was especially useful for this project because it measures how well the model identifies customers who actually churned. In a retention setting, missing a large number of high-risk customers could mean losing opportunities to intervene.
 
-```bash
-chmod +x bootstrap_real_data.sh
-./bootstrap_real_data.sh
-```
+The analysis also showed that some of the most important predictors included:
 
-That will:
+- **Tenure**
+- **Internet service**
+- **Contract type**
+- **Monthly charges**
+- **Total charges**
 
-1. install Python dependencies;
-2. download the real IBM CSV;
-3. train and compare the models;
-4. save the selected model to `model/best_churn_model.joblib`;
-5. create model metrics, feature importance, and scored test customers.
+Tenure had the strongest permutation importance in the selected model, suggesting that the length of the customer relationship contained particularly useful information when predicting churn.
 
-## Then push to GitHub
+## Project Outcome
 
-```bash
-git add .
-git commit -m "Replace synthetic churn data with IBM real dataset"
-git push
-```
+This project demonstrates the full workflow of turning customer data into a usable machine learning application:
 
-Vercel will redeploy automatically if the repository is already connected.
+**Data preparation → Model development → Model evaluation → Churn prediction → Business interpretation**
+
+The final application allows customer information to be entered directly into the model and returns:
+
+- Predicted churn probability
+- Low, medium, or high churn risk
+- A recommended retention action
+
+## Tools Used
+
+**Python · Pandas · scikit-learn · Machine Learning · Data Analysis · HTML/CSS/JavaScript · Vercel**
 
 ## Dataset
 
-See `DATA_SOURCE.md`.
+IBM Telco Customer Churn public sample dataset.
 
-Source: IBM Telco Customer Churn sample data, retrieved from the archived IBM GitHub repository.
-
-## Important portfolio framing
-
-Describe this as a **public IBM sample dataset**, not as private company customer data.
-
-The project demonstrates customer churn classification and retention prioritization. It is a portfolio/educational analysis and is not intended to make automated real-world customer decisions.
+This project was created for educational and portfolio purposes.
